@@ -156,7 +156,7 @@ def update_graph_for_slider(time_value_days, time_to_maturity_days):
     if time_to_maturity_days - time_value_days > 0:
     
         # Plotting the prices of the portfolio
-        figure = go.Figure(data=portfolio.compute_prices_at_date((time_to_maturity_days - time_value_days)/365))
+        figure = go.Figure(data=portfolio.compute_pnl_at_date((time_to_maturity_days - time_value_days)/365))
         figure.update_layout(title="PnL at date {}".format(time_value_days), xaxis_title="Underlying price", yaxis_title="PnL",
                             template="plotly_white", showlegend=True)
         

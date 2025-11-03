@@ -32,14 +32,15 @@ class Portfolio:
         traces.append(go.Scatter(x=S, y=total_payoff, mode='lines', name="Total", line=dict(width=4, color="black")))
         return traces
     
-    def compute_prices_at_date(self, curr_time_to_maturity):
+    def compute_pnl_at_date(self, curr_time_to_maturity):
         S = np.linspace(1, 2 * max(100, self.bigger_strike), 500)
         total_prices = np.zeros_like(S)
 
         traces = []
         for curr_position in self.portfolio:
-            prices = curr_position.get_prices_at_date(curr_time_to_maturity, S)
+            prices = curr_position.get_pnl_at_date(curr_time_to_maturity, S)
             total_prices += prices
+            traces.append(go.Scatter(x=S, y=prices, mode='lines', line=dict(width=1), name=f'{curr_position.direction} {curr_position.option_type} K={curr_position.option.strike}'))
             
         traces.append(go.Scatter(x=S, y=total_prices, mode='lines', name="Total", line=dict(width=4, color="black")))
         return traces
