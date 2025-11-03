@@ -1,7 +1,7 @@
 from .OptionFactory import option_factory
 
 class Position:
-    # TODO: passer à des types définis pas des strings
+    # TODO: switch to Long and Short types
     direction_sign = {"Long": 1, "Short": -1}
 
     def __init__(self, quantity, direction, option_type, strike, spot, volatility, time_to_maturity, risk_free_rate):
@@ -10,6 +10,12 @@ class Position:
         self.option_type = option_type
         self.option = option_factory(option_type, strike, spot, volatility, time_to_maturity, risk_free_rate)
 
+    def get_prices_at_date(self, time_to_maturity, prices):
+        option_prices = []
+        for curr_price in prices:
+            option_prices.append(self.direction_sign[self.direction] * self.quantity * self.option.compute_pnl_at_date(time_to_maturity, curr_price))
+        return option_prices
+    
     def get_payoffs(self, prices):
         return self.direction_sign[self.direction] * self.quantity * self.option.compute_payoffs(prices)
     

@@ -52,14 +52,16 @@ app.layout = dbc.Container([
 
         dbc.Col([
             dcc.Graph(id="payoff_graph", config={"displayModeBar": False}),
-            dash_table.DataTable(
-                id='greeks_table',
-                data=greeks_data,
-                columns=[{"name": col, "id": col, 'type': 'numeric', 'format': Format(precision=3, scheme=Scheme.fixed)} for col in greeks_data[0].keys()],
-                style_cell={'textAlign': 'center'},
-                style_header={'fontWeight': 'bold'}
-            ),
-            dbc.Row(children=[dbc.Label('Time'), dcc.Slider(0, 60, 1, value=60, id='time_slider')])
+            dbc.Row(children=[dbc.Label('Time'), dcc.Slider(1, 60, 1, value=60, id='time_slider')]),
+            html.Div([
+                html.Label("Portfolio greeks on initial date"),
+                dash_table.DataTable(
+                    id='greeks_table',
+                    data=greeks_data,
+                    columns=[{"name": col, "id": col, 'type': 'numeric', 'format': Format(precision=3, scheme=Scheme.fixed)} for col in greeks_data[0].keys()],
+                    style_cell={'textAlign': 'center'},
+                    style_header={'fontWeight': 'bold'}
+                )], style={"border-top":"2px solid black"})
         ], width=9)
     ])
 ], fluid=True)
@@ -67,7 +69,7 @@ app.layout = dbc.Container([
 # Callback to add an option
 @app.callback(
     Output("option_list", "children"),
-    Output("payoff_graph", "figure"),
+    Output("payoff_graph", "figure", allow_duplicate=True),
     Output("greeks_table", "data"),
     Output('spot', 'disabled'),
     Output('volatility', 'disabled'),
@@ -84,11 +86,11 @@ app.layout = dbc.Container([
     State("quantity", "value"),
     prevent_initial_call=True
 )
-def update_options(n_clicks, option_type, direction, strike, spot, volatility, time_to_maturity, risk_free_rate, quantity):
+def update_options(n_clicks, option_type, direction, strike, spot, volatility, time_to_maturity_days, risk_free_rate, quantity):
     global portfolio
     
     # Adding the new position to the portfolio
-    portfolio.add_position(quantity, direction, option_type, strike, spot, volatility, time_to_maturity/365, risk_free_rate)
+    portfolio.add_position(quantity, direction, option_type, strike, spot, volatility, time_to_maturity_days/365, risk_free_rate)
 
     # Plotting the payoff of the portfolio
     figure = go.Figure(data=portfolio.compute_pnl())
@@ -142,7 +144,30 @@ def update_slider_max(max_value):
         return val if val > 0 else 60
     except:
         return 100
+    
+@app.callback(
+    Output("payoff_graph", "figure", allow_duplicate=True),
+    Input('time_slider', 'value'),
+    Input('time_slider', 'max'),
+    prevent_initial_call=True
+)
+def update_graph_for_slider(time_value_days, time_to_maturity_days):
+    
+    if time_to_maturity_days - time_value_days > 0:
+    
+        # Plotting the prices of the portfolio
+        figure = go.Figure(data=portfolio.compute_prices_at_date((time_to_maturity_days - time_value_days)/365))
+        figure.update_layout(title="PnL at date {}".format(time_value_days), xaxis_title="Underlying price", yaxis_title="PnL",
+                            template="plotly_white", showlegend=True)
+        
+    else:
 
+        # Plotting the payoff of the portfolio
+        figure = go.Figure(data=portfolio.compute_pnl())
+        figure.update_layout(title="Maturity PnL", xaxis_title="Underlying price", yaxis_title="PnL",
+                            template="plotly_white", showlegend=True)
+        
+    return figure
 
 if __name__ == "__main__":
     app.run(debug=True)
