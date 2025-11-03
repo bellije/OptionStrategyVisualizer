@@ -17,6 +17,13 @@ Whether you're a trader, finance student, or hobbyist, this application helps yo
 - Butterfly Spread: Combine calls/puts to create a limited-risk, limited-reward strategy.
 - Covered Call: Sell a call while holding the underlying asset to generate income.
 
+## Testing
+- **Framework**: pytest
+- **Location**: Tests/
+- **Run tests**:
+  - pytest -v
+  - pytest Tests/test_module.py
+
 ## Getting started
 
 #### Prerequisites
