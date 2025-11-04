@@ -15,7 +15,6 @@ Whether you're a trader, finance student, or hobbyist, this application helps yo
 - Straddle: Buy a call and put at the same strike price.
 - Strangle: Buy a call and put at different strike prices.
 - Butterfly Spread: Combine calls/puts to create a limited-risk, limited-reward strategy.
-- Covered Call: Sell a call while holding the underlying asset to generate income.
 
 ## Testing
 - **Framework**: pytest

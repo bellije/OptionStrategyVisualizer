@@ -62,7 +62,7 @@ app.layout = dbc.Container([
                     style_cell={'textAlign': 'center'},
                     style_header={'fontWeight': 'bold'}
                 )], style={"border-top":"2px solid black"})
-        ], width=9)
+        ], width=9, style={"max-height":"60vh"})
     ])
 ], fluid=True)
 
@@ -87,6 +87,7 @@ app.layout = dbc.Container([
     prevent_initial_call=True
 )
 def update_options(n_clicks, option_type, direction, strike, spot, volatility, time_to_maturity_days, risk_free_rate, quantity):
+    print("Dans callback 1")
     global portfolio
     
     # Adding the new position to the portfolio
@@ -102,6 +103,8 @@ def update_options(n_clicks, option_type, direction, strike, spot, volatility, t
 
     # Portfolio greeks
     greeks_data = portfolio.get_greeks_data()
+
+ 
 
     return html.Ul([html.Li(opt) for opt in description]), figure, greeks_data, True, True, True, True
 
@@ -132,6 +135,9 @@ def reset_option_list(n_clicks):
     # Greeks resetting
     greeks_data=[{"delta": 0, "gamma": 0, "theta": 0, "vega": 0, "rho": 0}]
 
+    print("Dans callback 2")
+
+
     return html.Ul([html.Li(opt) for opt in description]), figure, greeks_data, False, False, False, False
 
 @app.callback(
@@ -139,6 +145,8 @@ def reset_option_list(n_clicks):
     Input('timetomaturity', 'value')
 )
 def update_slider_max(max_value):
+    print("Dans callback 3")
+
     try:
         val = float(max_value)
         return val if val > 0 else 60
@@ -152,7 +160,12 @@ def update_slider_max(max_value):
     prevent_initial_call=True
 )
 def update_graph_for_slider(time_value_days, time_to_maturity_days):
+    global portfolio
+
+    if len(portfolio.portfolio) == 0:
+        pass
     
+    print("Dans callback 4")
     if time_to_maturity_days - time_value_days > 0:
     
         # Plotting the prices of the portfolio
